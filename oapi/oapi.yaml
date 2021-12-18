@@ -1,0 +1,131 @@
+openapi: "3.0.0"
+
+info:
+  version: 1.0.0
+  title: be2_hw9 API
+  description: REST API
+  contact:
+    name: Konny
+    email: pehks1980@gmail.com
+    url: http://swagger.io
+
+servers:
+  - url: /api
+
+paths:
+  '/pricelist':
+    post:
+      operationId: pricelist entity create view
+      description: ''
+      requestBody:
+        description: pricelist entity create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pricelist'
+      responses:
+        '200':
+          description: pricelist response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pricelist'
+        default:
+          description: 'Pricelist entity create Error'
+
+      tags:
+        - Pricelist
+
+  '/pricelist/{id}':
+    get:
+      operationId: Pricelist list view
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+
+      responses:
+        '200':
+          description: 'Pricelist List OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pricelist'
+
+        default:
+          description: 'Pricelist List Error'
+
+      tags:
+        - Pricelist
+
+    put:
+      operationId: Pricelist update view
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+
+      requestBody:
+        description: Link to add to storage
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pricelist'
+
+      responses:
+        '200':
+          description: Link update success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pricelist'
+        default:
+          description: Link update errors
+
+      tags:
+        - Pricelist
+
+    delete:
+      operationId: Pricelist delete view
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: Pricelist delete success
+        default:
+          description: Pricelist delete errors
+      tags:
+        - Pricelist
+
+components:
+  schemas:
+    Pricelist:
+      type: object
+      properties:
+        id:
+          title: post- pricelist id / get- item unique id
+          type: integer
+          format: int
+        good:
+          type: string
+        price:
+          type: integer
+          format: int
+
+

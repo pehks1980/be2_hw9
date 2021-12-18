@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+// golang package where generated golang file to be placed
+// it means - create pb.go file in this dir, with package name as follows
+option go_package = "./;messageapiservice";
+
+message Request {
+  string id = 1; // формат сообщения
+  string body = 2;
+}
+
+message Response {
+  string id = 1; // формат ответа на сообщение message
+  string body = 2;
+}
+
+service MessageService {
+  rpc SendMessage (Request) returns (Response);  // in Message out Reply
+}
+
+// install grpc support code generation:
+// brew install protobuf
+// go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
+// go get google.golang.org/protobuf/cmd/protoc-gen-go
+// #export bin dir:
+// export PATH="$PATH:$(go env GOPATH)/bin"
+
+// complie it from metoda: (puts 2 *.pb.go files to grpc dir which ahs to be created at first)
+// protoc -I/usr/local/include -I . --go_out ./grpc --go_opt paths=source_relative --go-grpc_out=./grpc ./api.proto

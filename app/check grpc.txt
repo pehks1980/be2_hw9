@@ -1,0 +1,45 @@
+grpcurl -plaintext -v localhost:9090 list
+
+grpcurl -plaintext -v localhost:9090 list pricelists
+pricelists.CreatePriceListItem
+pricelists.DeletePriceList
+pricelists.GetPriceList
+pricelists.UpdatePriceListItem
+
+grpcurl -plaintext -v localhost:9090 describe pricelists
+pricelists is a service:
+service pricelists {
+  rpc CreatePriceListItem ( .PriceListItem ) returns ( .PriceListItem );
+  rpc DeletePriceList ( .ID ) returns ( .google.protobuf.Empty );
+  rpc GetPriceList ( .ID ) returns ( .PriceListRowsResponse );
+  rpc UpdatePriceListItem ( .PriceListItem ) returns ( .PriceListItem );
+}
+
+grpcurl -plaintext -d '{"pricelist_id": "46", "name": "grpc hello", "price" : "12345"}' localhost:9090 pricelists.CreatePriceListItem
+{
+  "pricelistId": "46",
+  "itemId": "5",
+  "name": "grpc hello",
+  "price": "12345"
+}
+
+grpcurl -plaintext -d '{"id":"45"}' localhost:9090 pricelists.GetPriceList
+{
+  "listRows": [
+    {
+      "pricelistId": "45",
+      "itemId": "100",
+      "name": "MIG 29",
+      "price": "100500"
+    },
+    {
+      "pricelistId": "45",
+      "itemId": "101",
+      "name": "MIG 35",
+      "price": "100500"
+    }
+  ]
+}
+
+
+

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+// golang package where generated golang file to be placed
+option go_package = "./;myservice";
+
+message Message {
+  string id = 1; // формат сообщения
+  string body = 2;
+}
+
+message Reply {
+  string id = 1; // формат ответа на сообщение message
+  string status = 2;
+}
+
+service MessageService {
+  rpc SendMessage(Message) returns (Reply) {} // in Message out Reply
+  rpc ServeMessage(Message) returns (stream Message) {} // in Message out stream Message
+  rpc StreamMessage(stream Message) returns (stream Message) {} // in stream Message out stream Message
+}

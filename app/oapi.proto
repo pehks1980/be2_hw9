@@ -1,0 +1,38 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+// golang package where generated golang file to be placed
+// it means - create pb.go file in this dir, with package name as follows
+option go_package = "./;pricelists";
+
+service pricelists {
+  rpc CreatePriceListItem(PriceListItem) returns (PriceListItem){}
+  rpc DeletePriceList (ID) returns (google.protobuf.Empty){}// zero response
+  rpc UpdatePriceListItem(PriceListItem) returns (google.protobuf.Empty){}
+  rpc GetPriceList(ID) returns (PriceListRowsResponse){}
+}
+
+message PriceListItem{
+  string pricelist_id = 1;
+  string item_id = 2;
+  string name = 3;
+  string price = 4;
+}
+
+message ID {
+  string id = 1;
+}
+
+message PriceListRowsResponse{
+  repeated PriceListItem list_rows=1; // сообщения можно вкладывать друг в друга repeated - массив значений элемента
+}
+
+// install grpc support code generation:
+// brew install protobuf
+// go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
+// go get google.golang.org/protobuf/cmd/protoc-gen-go
+// #export bin dir:
+// export PATH="$PATH:$(go env GOPATH)/bin"
+
+// complie it from metoda: (puts 2 *.pb.go files to grpc dir which ahs to be created at first) (execute from app dir)
+// protoc -I/usr/local/include -I . --go_out ./grpc --go_opt paths=source_relative --go-grpc_out=./grpc ./oapi.proto
