@@ -13,6 +13,7 @@ import (
 	"pehks1980/be2_hw9/oapi/api"
 )
 
+// taken from codegen example of petstore with minimal change
 func main() {
 	var port = flag.Int("port", 9000, "Port for test HTTP server")
 	var dbconn = flag.String("pg", "postgres://postuser:postpassword@192.168.1.204:5432/grpc?sslmode=disable", "postgres conn string: postgres://usr:pwd@localhost:5432/example?sslmode=disable")

@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	_ "fmt"
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/protobuf/types/known/emptypb"
 	_ "io"
 	"log"
@@ -14,14 +15,15 @@ import (
 
 var _ pricelists.PricelistsServer = &Server{}
 
+//Server - app structs
 type Server struct {
 	Ctx  context.Context
-    Repo *repository.Repo
+	Repo *repository.Repo
 	pricelists.UnimplementedPricelistsServer
 }
 
 //CreatePriceListItem - create pricelist entity
-func (srv *Server) CreatePriceListItem (ctx context.Context, req *pricelists.PriceListItem) (*pricelists.PriceListItem, error) {
+func (srv *Server) CreatePriceListItem(ctx context.Context, req *pricelists.PriceListItem) (*pricelists.PriceListItem, error) {
 
 	var newPriceListEntity repository.Pricelist
 	newPriceListEntity.Id, _ = strconv.Atoi(req.PricelistId)
@@ -37,38 +39,40 @@ func (srv *Server) CreatePriceListItem (ctx context.Context, req *pricelists.Pri
 	return req, nil
 }
 
-func (srv *Server) DeletePriceList (ctx context.Context, req *pricelists.ID) (*emptypb.Empty,error) {
+//DeletePriceList -delete pricelist
+func (srv *Server) DeletePriceList(ctx context.Context, req *pricelists.ID) (*emptypb.Empty, error) {
 	id, _ := strconv.Atoi(req.Id)
 	err := srv.Repo.DelPriceList(ctx, id)
 	if err != nil {
 		log.Printf("delete repo error: %v", err)
 		return nil, err
 	}
-	return nil, nil
+	return &empty.Empty{}, nil
 }
 
-func (srv *Server) UpdatePriceListItem (ctx context.Context, req *pricelists.PriceListItem) (*emptypb.Empty,error) {
+//UpdatePriceListItem - update pricelist entity(row)
+func (srv *Server) UpdatePriceListItem(ctx context.Context, req *pricelists.PriceListItem) (*emptypb.Empty, error) {
 	var newPriceListEntity repository.Pricelist
 	id, _ := strconv.Atoi(req.PricelistId)
-	newPriceListEntity.Id, _ =  strconv.Atoi(req.ItemId)
+	newPriceListEntity.Id, _ = strconv.Atoi(req.ItemId)
 	newPriceListEntity.Good = req.Name
 	newPriceListEntity.Price, _ = strconv.Atoi(req.Price)
-	err := srv.Repo.UpdatePriceList(ctx,id,newPriceListEntity)
+	err := srv.Repo.UpdatePriceList(ctx, id, newPriceListEntity)
 	if err != nil {
 		log.Printf("delete repo error: %v", err)
-		return nil,err
+		return nil, err
 	}
 	//no data updated here -)
-	return nil,nil
+	return &empty.Empty{}, nil
 }
 
-func (srv *Server) GetPriceList (ctx context.Context, req *pricelists.ID) (*pricelists.PriceListRowsResponse,error) {
-
+//GetPriceList - get pricelist as array of rows
+func (srv *Server) GetPriceList(ctx context.Context, req *pricelists.ID) (*pricelists.PriceListRowsResponse, error) {
 	res := []*pricelists.PriceListItem{}
 	id, _ := strconv.Atoi(req.Id)
 	result, _ := srv.Repo.GetPriceList(ctx, id)
 	//repack to output if struct
-	for _, dbrow := range result{
+	for _, dbrow := range result {
 		price := strconv.Itoa(dbrow.Price)
 		itemId := strconv.Itoa(dbrow.Id)
 		row := pricelists.PriceListItem{
@@ -79,8 +83,7 @@ func (srv *Server) GetPriceList (ctx context.Context, req *pricelists.ID) (*pric
 		}
 		res = append(res, &row)
 	}
-
-
+	//finish - insert to array struct
 	ans := pricelists.PriceListRowsResponse{ListRows: res}
 	return &ans, nil
 }

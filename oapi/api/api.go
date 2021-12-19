@@ -9,13 +9,13 @@ import (
 )
 
 type Api struct {
-	//pool       *pgxpool.Pool
 	repository *Repo
 }
 
 // Make sure we conform to ServerInterface
 var _ ServerInterface = (*Api)(nil)
 
+// NewApi - app structs init
 func NewApi(ctx context.Context, dbconn string) (*Api, error) {
 
 	newRepository, err := NewRepository(ctx, dbconn)
@@ -34,6 +34,7 @@ func NewApi(ctx context.Context, dbconn string) (*Api, error) {
 	}, nil
 }
 
+//PricelistEntityCreateView - create pricelist entity
 func (a *Api) PricelistEntityCreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	var newPriceListEntity Pricelist
@@ -51,6 +52,7 @@ func (a *Api) PricelistEntityCreateView(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(newPriceListEntity)
 }
 
+//PricelistDeleteView - delete pricelist entirely
 func (a *Api) PricelistDeleteView(w http.ResponseWriter, r *http.Request, id int) {
 	ctx := r.Context()
 	err := a.repository.DelPriceList(ctx, id)
@@ -61,21 +63,27 @@ func (a *Api) PricelistDeleteView(w http.ResponseWriter, r *http.Request, id int
 	w.WriteHeader(http.StatusNoContent)
 }
 
+//PricelistListView - get pricelist rows as array
 func (a *Api) PricelistListView(w http.ResponseWriter, r *http.Request, id int) {
 	ctx := r.Context()
 	var result []Pricelist
 
-	result, _ = a.repository.GetPriceList(ctx, id)
+	type ListRows struct {
+		Rows []Pricelist `json:"listRows"`
+	}
 
+	result, _ = a.repository.GetPriceList(ctx, id)
+	rows := ListRows{Rows: result}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(rows)
 }
 
+//PricelistUpdateView - update pricelist entity
+// id - pricelist number
 func (a *Api) PricelistUpdateView(w http.ResponseWriter, r *http.Request, id int) {
 	ctx := r.Context()
 	var updPriceListEntity Pricelist
 	if err := json.NewDecoder(r.Body).Decode(&updPriceListEntity); err != nil {
-		//sendPetstoreError(w, http.StatusBadRequest, "Invalid format for NewPet")
 		return
 	}
 	err := a.repository.UpdatePriceList(ctx, id, updPriceListEntity)

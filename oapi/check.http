@@ -2,7 +2,7 @@ DELETE http://127.0.0.1:9000/pricelist/45
 Accept: application/json
 
 ###
-GET http://127.0.0.1:9000/pricelist/45
+GET http://127.0.0.1:9000/pricelist/1
 Accept: application/json
 
 ###
@@ -10,7 +10,7 @@ POST http://127.0.0.1:9000/pricelist
 Content-Type: application/json
 
 {
-  "id": 45,
+  "id": 4,
   "good": "MIG 35",
   "price": 100500
 }
@@ -20,7 +20,7 @@ PUT http://127.0.0.1:9000/pricelist/46
 Content-Type: application/json
 
 {
-  "id": 100,
+  "id": 101,
   "good": "F-16",
   "price": 256
 }

@@ -6,13 +6,12 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"log"
-
-	//"pehks1980/be2_hw9/oapi/api"
 )
 
 type Repo struct {
 	pool *pgxpool.Pool
 }
+
 // этот репозиторий не проверяет консистентность и наличие всех данных для совершения действа с бд!
 // be aware!!!
 type Pricelist struct {
@@ -22,7 +21,7 @@ type Pricelist struct {
 }
 
 const (
-	DDL= `
+	DDL = `
 	BEGIN;
 	-- Adminer 4.7.7 PostgreSQL dump
 	DROP TABLE IF EXISTS "pricelists";
@@ -94,7 +93,6 @@ const (
 	DELETE FROM "pricelists" 
 	WHERE "pricelist_id" = $1
 	`
-
 )
 
 func NewRepository(ctx context.Context, dbconn string) (*Repo, error) {
@@ -126,7 +124,7 @@ func (r *Repo) GetPriceList(ctx context.Context, id int) ([]Pricelist, error) {
 		var pricelistrow Pricelist
 
 		if err := rows.Scan(&pricelistrow.Id, &pricelistrow.Good, &pricelistrow.Price); err != nil {
-			log.Printf("error get from sql: %v",err)
+			log.Printf("error get from sql: %v", err)
 			return nil, err
 		}
 

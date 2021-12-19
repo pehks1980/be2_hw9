@@ -42,4 +42,23 @@ grpcurl -plaintext -d '{"id":"45"}' localhost:9090 pricelists.GetPriceList
 }
 
 
+grpcurl -plaintext -d '{"id":"1"}' localhost:9090 pricelists.GetPriceList
+{
+  "listRows": [
+    {
+      "pricelistId": "1",
+      "itemId": "1",
+      "name": "bricks",
+      "price": "21"
+    },
+    {
+      "pricelistId": "1",
+      "itemId": "2",
+      "name": "wood",
+      "price": "46"
+    }
+  ]
+}
+
+
 
