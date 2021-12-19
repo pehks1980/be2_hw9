@@ -8,9 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"pehks1980/be2_hw9/oapi/api"
 
 	middleware "github.com/deepmap/oapi-codegen/pkg/chi-middleware"
-	"pehks1980/be2_hw9/oapi/api"
 )
 
 // taken from codegen example of petstore with minimal change

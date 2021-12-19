@@ -25,7 +25,7 @@ type Server struct {
 //CreatePriceListItem - create pricelist entity
 func (srv *Server) CreatePriceListItem(ctx context.Context, req *pricelists.PriceListItem) (*pricelists.PriceListItem, error) {
 
-	var newPriceListEntity repository.Pricelist
+	var newPriceListEntity repository.Pricelist // элемент для репозитория
 	newPriceListEntity.Id, _ = strconv.Atoi(req.PricelistId)
 	newPriceListEntity.Good = req.Name
 	newPriceListEntity.Price, _ = strconv.Atoi(req.Price)
@@ -36,6 +36,7 @@ func (srv *Server) CreatePriceListItem(ctx context.Context, req *pricelists.Pric
 		return nil, err
 	}
 	req.ItemId = strconv.Itoa(id)
+
 	return req, nil
 }
 

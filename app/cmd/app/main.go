@@ -27,6 +27,11 @@ func main() {
 	if err1 != nil {
 		log.Fatalf("repository problem: %v", err1)
 	}
+
+	err = repo.InitSchema(ctx)
+	if err != nil {
+		log.Fatalf("repository DDL exec problem: %v", err)
+	}
 	// register server
 	server := &api.Server{
 		Repo: repo,

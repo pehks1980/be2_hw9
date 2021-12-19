@@ -6,15 +6,16 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"log"
-	//"pehks1980/be2_hw9/oapi/api"
 )
 
 type Repo struct {
 	pool *pgxpool.Pool
 }
 
+// этот репозиторий не проверяет консистентность и наличие всех данных для совершения действа с бд!
+// be aware!!!
 /*
-type PricelistR struct {
+type Pricelist struct {
 	Id    int    `json:"id"`
 	Good  string `json:"good"`
 	Price int    `json:"price"`
@@ -24,40 +25,43 @@ const (
 	DDL = `
 	BEGIN;
 	-- Adminer 4.7.7 PostgreSQL dump
-	DROP TABLE IF EXISTS "pricelists";
+	DROP TABLE IF EXISTS "pricelists" CASCADE ;
 	DROP TABLE IF EXISTS "goods";
 	DROP SEQUENCE IF EXISTS "Goods_id_seq";
 	DROP SEQUENCE IF EXISTS "PriceList_id_seq";
-	CREATE SEQUENCE "Goods_id_seq" INCREMENT 1 MINVALUE 100 START 100;
-	CREATE SEQUENCE "PriceList_id_seq" INCREMENT 1 MINVALUE 4 START 4;
-
-	CREATE TABLE "public"."goods" (
-		"id" bigint DEFAULT nextval('"Goods_id_seq"') NOT NULL,
-		"name" character varying NOT NULL,
-		CONSTRAINT "goods_pkey" PRIMARY KEY ("id")
-	);
-	
-	INSERT INTO "goods" ("id", "name") VALUES
-	(1,	'bricks'),
-	(2,	'wood'),
-	(3,	'ceiling'),
-	(4,	'furniture'),
-	(5,	'tv-set');
-	
+	CREATE SEQUENCE "Goods_id_seq" INCREMENT 1 MINVALUE 6 START 6;
+	CREATE SEQUENCE "PriceList_id_seq" INCREMENT 1 MINVALUE 6 START 6;
 	
 	CREATE TABLE "public"."pricelists" (
-		"id" bigint DEFAULT nextval('"PriceList_id_seq"') NOT NULL,
-		"price" numeric NOT NULL,
-		"good_id" bigint NOT NULL,
-		"pricelist_id" bigint NOT NULL,
-		CONSTRAINT "pricelist_pkey" PRIMARY KEY ("id"),
-		CONSTRAINT "fk_good" FOREIGN KEY (good_id) REFERENCES goods(id) ON DELETE CASCADE NOT DEFERRABLE
+		   "id" bigint DEFAULT nextval('"PriceList_id_seq"') NOT NULL,
+		   "price" numeric NOT NULL,
+		   "pricelist_id" bigint NOT NULL,
+		   CONSTRAINT "pricelists_pkey" PRIMARY KEY ("id")
 	);
 	
-	INSERT INTO "pricelists" ("id", "price", "good_id", "pricelist_id") VALUES
-	(1,	20.55,	1,	1),
-	(3,	45.99,	2,	1),
-	(2,	100.33,	5,	2);
+	CREATE TABLE "public"."goods" (
+		  "id" bigint DEFAULT nextval('"Goods_id_seq"') NOT NULL,
+		  "name" character varying NOT NULL,
+		  "pricelists_id" bigint NOT NULL,
+		  CONSTRAINT "goods_pkey" PRIMARY KEY ("id"),
+		  CONSTRAINT "fk_pricelists" FOREIGN KEY (pricelists_id) REFERENCES pricelists(id) ON DELETE CASCADE NOT DEFERRABLE
+	);
+	
+	INSERT INTO "pricelists" ("id", "price", "pricelist_id") VALUES
+			(1,	20.55,	1),
+			(2,	45.99,	1),
+			(3,	100.33,	2),
+			(4,	10.33,	2),
+			(5,	1000.33, 3);
+	
+	INSERT INTO "goods" ("id", "name", "pricelists_id") VALUES
+										   (1,	'bricks', 1),
+										   (2,	'wood', 2),
+										   (3,	'ceiling', 3 ),
+										   (4,	'furniture', 4),
+										   (5,	'tv-set', 5);
+	
+	
 	
 	-- 2021-12-16 04:44:53.24713+00
 	COMMIT;
@@ -66,28 +70,27 @@ const (
 	GetPriceListSQL = `
 	SELECT goods.id::integer, goods.name::varchar, pricelists.price::integer
 	FROM pricelists
-	INNER JOIN goods ON pricelists.good_id = goods.id 
+	INNER JOIN goods ON pricelists.id = goods.pricelists_id
 	WHERE pricelist_id = $1;
 	`
 	//$1 pricelist id $2 good $3 price
 	InsertPriceListEntitySQL = `
-	WITH ins1 AS (INSERT INTO "goods" (name) values ($2)
-   	RETURNING id)
-	INSERT INTO "pricelists" ("price", "good_id", "pricelist_id") 
-	VALUES ($3, (select id from ins1), $1)
+	WITH ins1 AS (INSERT INTO pricelists (price, pricelist_id) values ($3, $1)
+	RETURNING id)
+	INSERT INTO goods (name, pricelists_id)
+	VALUES ( $2, (select id from ins1))
 	returning id;
 	`
-	// $1 good_id $2 name
-	UpdatePriceListEntity1SQL = `
-	 UPDATE "goods"
-     SET name = $2
-     WHERE id = $1	
-	`
-	// $1 pricelist_id $2 good_id $3 price
-	UpdatePriceListEntity2SQL = `
-	 UPDATE "pricelists"
-     SET price = $3
-     WHERE good_id = $2	AND pricelist_id = $1
+	// $1 good_id $2 name $3 price
+	UpdatePriceListEntitySQL = `
+	WITH upd1 AS (UPDATE goods
+    SET name = $2
+    WHERE id = $1
+    RETURNING pricelists_id)
+	UPDATE pricelists
+	SET price = $3
+	WHERE id = (select pricelists_id from upd1)
+	RETURNING id;
 	`
 	DeletePriceListSQL = `
 	DELETE FROM "pricelists" 
@@ -159,11 +162,7 @@ func (r *Repo) DelPriceList(ctx context.Context, id int) error {
 }
 
 func (r *Repo) UpdatePriceList(ctx context.Context, id int, pricelistentity Pricelist) error {
-	_, err := r.pool.Exec(ctx, UpdatePriceListEntity1SQL, pricelistentity.Id, pricelistentity.Good)
-	if err != nil {
-		return fmt.Errorf("failed to update pricelist: %w", err)
-	}
-	_, err = r.pool.Exec(ctx, UpdatePriceListEntity2SQL, id, pricelistentity.Id, pricelistentity.Price)
+	_, err := r.pool.Exec(ctx, UpdatePriceListEntitySQL, pricelistentity.Id, pricelistentity.Good, pricelistentity.Price)
 	if err != nil {
 		return fmt.Errorf("failed to update pricelist: %w", err)
 	}
