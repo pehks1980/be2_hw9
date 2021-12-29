@@ -60,7 +60,7 @@ func (srv *Server) UpdatePriceListItem(ctx context.Context, req *pricelists.Pric
 	newPriceListEntity.Price, _ = strconv.Atoi(req.Price)
 	err := srv.Repo.UpdatePriceList(ctx, id, newPriceListEntity)
 	if err != nil {
-		log.Printf("delete repo error: %v", err)
+		log.Printf("Update repo error: %v", err)
 		return nil, err
 	}
 	//no data updated here -)
