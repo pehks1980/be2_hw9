@@ -20,7 +20,7 @@ type PriceListItem struct {
 }
 
 type Result struct {
-	Result *bool `json:"result"`
+	Result bool `json:"result"`
 }
 
 type UpdPriceListItem struct {

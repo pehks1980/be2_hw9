@@ -55,13 +55,11 @@ func (r *mutationResolver) UpdatePriceListItem(ctx context.Context, input model.
 func (r *mutationResolver) DeletePriceList(ctx context.Context, input model.ID) (*model.Result, error) {
 	id, _ := strconv.Atoi(input.PricelistID)
 	err := repository.Reposit.DelPriceList(ctx, id)
-	res := true
 	if err != nil {
 		log.Printf("delete repo error: %v", err)
-		res = false
-		return &model.Result{Result: &res}, err
+		return &model.Result{Result: false}, err
 	}
-	return &model.Result{Result: &res}, err
+	return &model.Result{Result: true}, err
 }
 
 func (r *queryResolver) ListRows(ctx context.Context, pricelistID string) ([]*model.PriceListItem, error) {

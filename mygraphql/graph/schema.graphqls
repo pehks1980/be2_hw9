@@ -7,7 +7,7 @@ type PriceListItem {
 }
 
 type Result {
-    result : Boolean
+    result : Boolean!
 }
 
 type Query {
