@@ -1,0 +1,82 @@
+#list rows of pricelist
+
+query {
+	list_rows(pricelist_id: "1") {
+    name
+    price
+    item_id
+  }
+}
+
+#response:
+{
+  "data": {
+    "list_rows": [
+      {
+        "name": "bricks",
+        "price": "21",
+        "item_id": "1"
+      },
+      {
+        "name": "wood",
+        "price": "46",
+        "item_id": "2"
+      }
+    ]
+  }
+}
+
+#create:
+
+mutation {
+  createPriceListItem(input: {pricelist_id:"13",name:"DADAb",price:"350"}){
+    pricelist_id,
+    item_id,
+    name,
+    price,
+  }
+}
+
+#resp
+
+{
+  "data": {
+    "createPriceListItem": {
+      "pricelist_id": "13",
+      "item_id": "6",
+      "name": "DADAb",
+      "price": "350"
+    }
+  }
+}
+
+#delete:
+
+mutation {
+  deletePriceList(input: {pricelist_id:"1"}){
+    result,  }
+}
+
+#update:
+
+mutation {
+  updatePriceListItem(input: {pricelist_id:"1", item_id: "1", name:"DADAb",price:"350"}){
+    pricelist_id,
+    item_id,
+    name,
+    price,
+  }
+}
+
+#resp
+
+{
+  "data": {
+    "updatePriceListItem": {
+      "pricelist_id": "1",
+      "item_id": "1",
+      "name": "DADAb",
+      "price": "350"
+    }
+  }
+}

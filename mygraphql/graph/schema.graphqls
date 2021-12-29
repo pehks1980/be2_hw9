@@ -1,0 +1,39 @@
+
+type PriceListItem {
+	pricelist_id: ID!
+    item_id: ID!
+    name: String!
+    price: String!
+}
+
+type Result {
+    result : Boolean
+}
+
+type Query {
+  list_rows(pricelist_id: String! ): [PriceListItem!]!
+}
+
+input NewPriceListItem {
+	pricelist_id: String! 
+	name: String!
+    price: String!
+}
+
+input UpdPriceListItem {
+    pricelist_id: String!
+    item_id: String!
+    name: String!
+    price: String!
+}
+
+input Id {
+    pricelist_id: String!
+}
+
+type Mutation {
+  #
+  createPriceListItem(input: NewPriceListItem!): PriceListItem!
+  updatePriceListItem(input: UpdPriceListItem!): PriceListItem!
+  deletePriceList(input: Id!): Result!
+}
